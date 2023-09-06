@@ -15,4 +15,4 @@ app.get("/notes/:id", async (req, res) => {
     const id = req.params.id
     const note = await getNote(id)
     res.send(note)
-  })
+});
