@@ -9,4 +9,4 @@ app.use(express.json());
 app.get("/notes", async (req, res) => {
     const notes = await getNotes()
     res.send(notes)
-  })
+})
