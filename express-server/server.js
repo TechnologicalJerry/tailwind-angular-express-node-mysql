@@ -22,3 +22,9 @@ app.post("/notes", async (req, res) => {
     const note = await createNote(title, contents)
     res.status(201).send(note)
 });
+
+
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send('Something broke 💩')
+});
