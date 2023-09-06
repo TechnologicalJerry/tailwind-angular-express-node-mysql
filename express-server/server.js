@@ -16,3 +16,9 @@ app.get("/notes/:id", async (req, res) => {
     const note = await getNote(id)
     res.send(note)
 });
+
+app.post("/notes", async (req, res) => {
+    const { title, contents } = req.body
+    const note = await createNote(title, contents)
+    res.status(201).send(note)
+});
