@@ -9,3 +9,7 @@ CREATE TABLE todos
     created TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+INSERT INTO todos (title, item)
+VALUES 
+('My First Item', 'A item about something'),
+('My Second Item', 'A item about something else');
