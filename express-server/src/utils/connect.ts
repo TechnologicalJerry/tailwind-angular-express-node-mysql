@@ -1,32 +1,15 @@
-import mysql from "mysql2/promise";
+import mongoose from "mongoose";
 import config from "config";
-import logger from "./logger";
+import logger from "./utils/logger";
 
 async function connect() {
-  const dbConfig = {
-    host: config.get<string>("dbHost"),
-    user: config.get<string>("dbUser"),
-    password: config.get<string>("dbPassword"),
-    database: config.get<string>("dbName"),
-  };
+  const dbUri = config.get<string>("dbUri");
 
   try {
-    // Create a MySQL connection pool
-    const pool = mysql.createPool({
-      ...dbConfig,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
-
-    // Test the connection
-    const connection = await pool.getConnection();
-    logger.info("Connected to MySQL database");
-    connection.release();
-
-    return pool; // Return the pool for use in the application
+    await mongoose.connect(dbUri);
+    logger.info("Connected to MongoDB database");
   } catch (error: any) {
-    logger.error(`Could not connect to MySQL database: ${error.message}`);
+    logger.error(`Could not connect to MongoDB database: ${error.message}`);
     process.exit(1);
   }
 }
