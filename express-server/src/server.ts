@@ -1,47 +1,76 @@
-import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import config from "config";
-import responseTime from "response-time";
+import createApp from "./app";
 import connect from "./utils/connect";
 import logger from "./utils/logger";
-import routes from "./routes";
-import deserializeUser from "./middleware/deserializeUser";
-import { restResponseTimeHistogram, startMetricsServer } from "./utils/metrics";
+import { startMetricsServer } from "./utils/metrics";
 import swaggerDocs from "./utils/swagger";
 
+// Load environment variables
 dotenv.config();
 
-const port = config.get<number>("port");
+async function startServer() {
+  try {
+    console.log("Starting server initialization...");
+    
+    // Get port from configuration
+    console.log("1. Loading configuration...");
+    const port = config.get<number>("port");
+    console.log(`   Port: ${port}`);
 
-const server = express();
+    // Create Express app
+    console.log("2. Creating Express app...");
+    const app = createApp();
+    console.log("   ✅ Express app created successfully");
 
-server.use(express.json());
+    // Connect to database
+    console.log("3. Connecting to database...");
+    await connect();
+    logger.info("Database connected successfully");
 
-server.use(deserializeUser);
+    // Start the server
+    console.log("4. Starting HTTP server...");
+    const server = app.listen(port, () => {
+      logger.info(`Server is running at http://localhost:${port}`);
+    });
 
-server.use(
-  responseTime((req: Request, res: Response, time: number) => {
-    if (req?.route?.path) {
-      restResponseTimeHistogram.observe(
-        {
-          method: req.method,
-          route: req.route.path,
-          status_code: res.statusCode,
-        },
-        time * 1000
-      );
-    }
-  })
-);
+    // Start metrics server
+    console.log("5. Starting metrics server...");
+    startMetricsServer();
+    logger.info("Metrics server started");
 
-server.listen(port, async () => {
-  logger.info(`Application Server is running at http://localhost:${port}`);
+    // Setup Swagger documentation
+    console.log("6. Setting up Swagger documentation...");
+    swaggerDocs(app, port);
+    logger.info("Swagger documentation setup complete");
 
-  await connect();
+    console.log("✅ Server started successfully!");
 
-  routes(server);
+    // Graceful shutdown
+    const gracefulShutdown = (signal: string) => {
+      logger.info(`Received ${signal}, shutting down gracefully`);
+      server.close(() => {
+        logger.info("HTTP server closed");
+        process.exit(0);
+      });
+    };
 
-  startMetricsServer();
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-  swaggerDocs(server, port);
-});
+  } catch (error: any) {
+    console.error("❌ Failed to start server:");
+    console.error("Error message:", error.message);
+    console.error("Stack trace:", error.stack);
+    logger.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+// Start the server only if this file is run directly
+if (require.main === module) {
+  startServer();
+}
+
+export { startServer };
+export default createApp;
