@@ -31,11 +31,11 @@ import { object, string, TypeOf } from "zod";
  *          type: string
  *        name:
  *          type: string
- *        _id:
+ *        id:
+ *          type: number
+ *        created_at:
  *          type: string
- *        createdAt:
- *          type: string
- *        updatedAt:
+ *        updated_at:
  *          type: string
  */
 
