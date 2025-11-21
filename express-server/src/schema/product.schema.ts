@@ -27,10 +27,10 @@ import { object, number, string, TypeOf } from "zod";
  *     productResponse:
  *       type: object
  *       properties:
- *         user:
- *           type: string
- *         _id:
- *           type: string
+ *         user_id:
+ *           type: number
+ *         id:
+ *           type: number
  *         title:
  *           type: string
  *         description:
@@ -39,14 +39,12 @@ import { object, number, string, TypeOf } from "zod";
  *           type: number
  *         image:
  *           type: string
- *         productId:
+ *         product_id:
  *           type: string
- *         createdAt:
+ *         created_at:
  *           type: string
- *         updatedAt:
+ *         updated_at:
  *           type: string
- *         __v:
- *           type: number
  *
  */
 
