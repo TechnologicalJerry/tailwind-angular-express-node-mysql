@@ -1,4 +1,3 @@
-import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
 import ProductModel, {
   ProductDocument,
   ProductInput,
@@ -22,8 +21,8 @@ export async function createProduct(input: ProductInput) {
 }
 
 export async function findProduct(
-  query: FilterQuery<ProductDocument>,
-  options: QueryOptions = { lean: true }
+  query: Partial<ProductDocument>,
+  options: { lean?: boolean } = { lean: true }
 ) {
   const metricsLabels = {
     operation: "findProduct",
@@ -31,7 +30,7 @@ export async function findProduct(
 
   const timer = databaseResponseTimeHistogram.startTimer();
   try {
-    const result = await ProductModel.findOne(query, {}, options);
+    const result = await ProductModel.findOne(query, options);
     timer({ ...metricsLabels, success: "true" });
     return result;
   } catch (e) {
@@ -42,13 +41,13 @@ export async function findProduct(
 }
 
 export async function findAndUpdateProduct(
-  query: FilterQuery<ProductDocument>,
-  update: UpdateQuery<ProductDocument>,
-  options: QueryOptions
+  query: Partial<ProductDocument>,
+  update: Partial<ProductDocument>,
+  options: { new?: boolean } = {}
 ) {
   return ProductModel.findOneAndUpdate(query, update, options);
 }
 
-export async function deleteProduct(query: FilterQuery<ProductDocument>) {
+export async function deleteProduct(query: Partial<ProductDocument>) {
   return ProductModel.deleteOne(query);
 }
