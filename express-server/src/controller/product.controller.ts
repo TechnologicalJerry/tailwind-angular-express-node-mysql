@@ -14,11 +14,11 @@ export async function createProductHandler(
   req: Request<{}, {}, CreateProductInput["body"]>,
   res: Response
 ) {
-  const userId = res.locals.user._id;
+  const userId = res.locals.user.id;
 
   const body = req.body;
 
-  const product = await createProduct({ ...body, user: userId });
+  const product = await createProduct({ ...body, user_id: userId });
 
   return res.send(product);
 }
@@ -27,22 +27,22 @@ export async function updateProductHandler(
   req: Request<UpdateProductInput["params"]>,
   res: Response
 ) {
-  const userId = res.locals.user._id;
+  const userId = res.locals.user.id;
 
   const productId = req.params.productId;
   const update = req.body;
 
-  const product = await findProduct({ productId });
+  const product = await findProduct({ product_id: productId });
 
   if (!product) {
     return res.sendStatus(404);
   }
 
-  if (String(product.user) !== userId) {
+  if (product.user_id !== userId) {
     return res.sendStatus(403);
   }
 
-  const updatedProduct = await findAndUpdateProduct({ productId }, update, {
+  const updatedProduct = await findAndUpdateProduct({ product_id: productId }, update, {
     new: true,
   });
 
@@ -54,7 +54,7 @@ export async function getProductHandler(
   res: Response
 ) {
   const productId = req.params.productId;
-  const product = await findProduct({ productId });
+  const product = await findProduct({ product_id: productId });
 
   if (!product) {
     return res.sendStatus(404);
@@ -67,20 +67,20 @@ export async function deleteProductHandler(
   req: Request<UpdateProductInput["params"]>,
   res: Response
 ) {
-  const userId = res.locals.user._id;
+  const userId = res.locals.user.id;
   const productId = req.params.productId;
 
-  const product = await findProduct({ productId });
+  const product = await findProduct({ product_id: productId });
 
   if (!product) {
     return res.sendStatus(404);
   }
 
-  if (String(product.user) !== userId) {
+  if (product.user_id !== userId) {
     return res.sendStatus(403);
   }
 
-  await deleteProduct({ productId });
+  await deleteProduct({ product_id: productId });
 
   return res.sendStatus(200);
 }
