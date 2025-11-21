@@ -1,22 +1,245 @@
-## tailwind-angular-express-node-mysql
+# Express MySQL Node.js Server
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+A modern Express.js server with MySQL database integration, featuring proper separation of concerns, comprehensive API documentation, and production-ready architecture.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## 🚀 Features
 
-## Add your files
+- **Express.js** with TypeScript
+- **MySQL** database integration with mysql2
+- **Separated App and Server** for better testability
+- **JWT Authentication** with refresh tokens
+- **Swagger/OpenAPI** documentation
+- **Prometheus Metrics** integration
+- **Graceful Shutdown** handling
+- **CORS** enabled
+- **Input Validation** with Zod
+- **Password Hashing** with bcrypt
+- **Comprehensive Logging** with Pino
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## 📁 Project Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/technologicaljerry/swagger-express-mongoose-node-mongo.git
-git branch -M main
-git push -uf origin main
+src/
+├── app.ts              # Express app configuration
+├── server.ts           # Server startup and lifecycle
+├── routes.ts           # API routes definition
+├── controller/         # Route handlers
+├── models/             # Database models
+├── service/            # Business logic
+├── middleware/         # Custom middleware
+├── schema/             # Zod validation schemas
+└── utils/              # Utility functions
 ```
 
-## Integrate with your tools
+## 🛠️ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd express-server
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Setup MySQL database**
+   ```bash
+   mysql -u root -p < schema.sql
+   ```
+
+4. **Configure environment**
+   ```bash
+   # Copy and modify configuration
+   cp config/default.ts config/production.ts
+   ```
+
+## 🚦 Quick Start
+
+### Development
+```bash
+npm run dev              # Start development server with hot reload
+npm run build:watch      # Build TypeScript in watch mode
+npm run test-db         # Test database connection
+```
+
+### Production
+```bash
+npm run build           # Build TypeScript
+npm start              # Start production server
+```
+
+### Testing
+```bash
+npm test               # Run tests
+npm run test:watch     # Run tests in watch mode
+```
+
+## 📋 API Endpoints
+
+### Authentication
+- `POST /api/users` - Register new user
+- `POST /api/sessions` - Login user
+- `GET /api/sessions` - Get user sessions
+- `DELETE /api/sessions` - Logout user
+
+### Products
+- `POST /api/products` - Create product
+- `GET /api/products/:productId` - Get product
+- `PUT /api/products/:productId` - Update product
+- `DELETE /api/products/:productId` - Delete product
+
+### Utilities
+- `GET /health` - Health check
+- `GET /metrics` - Prometheus metrics
+- `GET /docs` - Swagger documentation
+
+## 🔧 Configuration
+
+Configuration is managed through the `config` directory:
+
+```typescript
+// config/default.ts
+export default {
+  port: 5050,
+  database: {
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "",
+    database: "angular_express_node_mysql"
+  },
+  saltWorkFactor: 10,
+  accessTokenTtl: "15m",
+  refreshTokenTtl: "1y",
+  // JWT keys...
+};
+```
+
+### Environment Variables
+
+```bash
+NODE_ENV=production
+PORT=5050
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=angular_express_node_mysql
+```
+
+## 📊 Database Schema
+
+The application uses MySQL with the following tables:
+
+- **users** - User accounts with email/password
+- **sessions** - User authentication sessions
+- **products** - Product catalog with user ownership
+
+See `schema.sql` for complete database structure.
+
+## 🧪 Testing
+
+The project includes comprehensive testing setup:
+
+```bash
+# Install testing dependencies
+npm install --save-dev jest @types/jest supertest @types/supertest ts-jest
+
+# Run tests
+npm test
+```
+
+Example test:
+```typescript
+import request from "supertest";
+import createApp from "../src/app";
+
+const app = createApp();
+
+test("Health check", async () => {
+  const response = await request(app)
+    .get("/health")
+    .expect(200);
+    
+  expect(response.body.status).toBe("OK");
+});
+```
+
+## 📚 Documentation
+
+- **[MySQL Migration Guide](./MYSQL_MIGRATION.md)** - Migration from MongoDB
+- **[Server-App Separation](./SERVER_APP_SEPARATION.md)** - Architecture explanation
+- **Swagger Documentation** - Available at `/docs` when server is running
+
+## 🔒 Security Features
+
+- **JWT Authentication** with access and refresh tokens
+- **Password Hashing** using bcrypt
+- **Input Validation** with Zod schemas
+- **CORS** protection
+- **SQL Injection** protection with parameterized queries
+
+## 🚀 Deployment
+
+### Docker (Recommended)
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY dist/ ./dist/
+EXPOSE 5050
+CMD ["node", "dist/server.js"]
+```
+
+### PM2
+```bash
+npm install -g pm2
+npm run build
+pm2 start dist/server.js --name "express-mysql-server"
+```
+
+## 📈 Monitoring
+
+- **Health Check**: `GET /health`
+- **Metrics**: `GET /metrics` (Prometheus format)
+- **Logging**: Structured logging with Pino
+- **Graceful Shutdown**: Proper cleanup on termination signals
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Troubleshooting
+
+### Database Connection Issues
+```bash
+# Test database connection
+npm run test-db
+
+# Check MySQL service status
+systemctl status mysql
+```
+
+### Development Issues
+```bash
+# Clear node modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+
+# Check TypeScript compilation
+npm run build
+```
 
 - [ ] [Set up project integrations](https://gitlab.com/technologicaljerry/swagger-express-mongoose-node-mongo/-/settings/integrations)
 
