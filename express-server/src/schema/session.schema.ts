@@ -9,26 +9,24 @@ import { object, string } from "zod";
  *       items:
  *         type: object
  *         required:
- *           - user
+ *           - user_id
  *           - valid
- *           - userAgent
- *           - createdAt
- *           - updatedAt
+ *           - user_agent
+ *           - created_at
+ *           - updated_at
  *         properties:
- *           _id:
- *             type: string
- *           user:
- *             type: string
+ *           id:
+ *             type: number
+ *           user_id:
+ *             type: number
  *           valid:
  *             type: boolean
- *           userAgent:
+ *           user_agent:
  *             type: string
- *           createdAt:
+ *           created_at:
  *             type: string
- *           updatedAt:
+ *           updated_at:
  *             type: string
- *           __v:
- *             type: number
  *     CreateSessionInput:
  *       type: object
  *       required:
