@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createProductHandler,
   getProductHandler,
+  getProductsHandler,
   updateProductHandler,
   deleteProductHandler,
 } from '../controller/product.controller';
@@ -15,6 +16,19 @@ import {
 } from '../schema/product.schema';
 
 const router = Router();
+
+/**
+ * @openapi
+ * '/api/products':
+ *  get:
+ *    tags:
+ *    - Products
+ *    summary: Get all products
+ *    responses:
+ *      200:
+ *        description: Success
+ */
+router.get('/', getProductsHandler);
 
 /**
  * @openapi
