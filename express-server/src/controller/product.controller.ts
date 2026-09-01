@@ -8,7 +8,13 @@ import {
   deleteProduct,
   findAndUpdateProduct,
   findProduct,
+  findProducts,
 } from "../service/product.service";
+
+export async function getProductsHandler(req: Request, res: Response) {
+  const products = await findProducts();
+  return res.send(products);
+}
 
 export async function createProductHandler(
   req: Request<{}, {}, CreateProductInput["body"]>,
