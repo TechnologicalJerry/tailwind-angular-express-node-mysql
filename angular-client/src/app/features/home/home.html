@@ -1,1 +1,91 @@
-<p>home works!</p>
+<section class="hero-banner">
+  <div class="hero-content">
+    <span class="hero-badge">⚡ Express + Angular Powered Marketplace</span>
+    <h1 class="hero-title">Discover & Trade <br><span class="gradient-text">Premium Electronics</span></h1>
+    <p class="hero-subtitle">
+      Explore high quality gear, DSLR cameras, laptops & accessories. Seamlessly synchronized with Express backend API.
+    </p>
+
+    @if (auth.isAuthenticated()) {
+      <div class="hero-cta">
+        <a routerLink="/products/new" class="btn btn-primary btn-lg">+ Create New Product</a>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Filter & Search Controls -->
+<section class="controls-section glass-panel">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input
+      type="text"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+      placeholder="Search products by title or keywords..."
+      class="search-input"
+    />
+  </div>
+
+  <div class="filter-box">
+    <label class="filter-label">Max Price: <strong class="gradient-text">${{ maxPriceFilter() }}</strong></label>
+    <input
+      type="range"
+      min="50"
+      max="5000"
+      step="50"
+      [ngModel]="maxPriceFilter()"
+      (ngModelChange)="maxPriceFilter.set($event)"
+      class="price-slider"
+    />
+  </div>
+</section>
+
+<!-- Products Showcase -->
+<section class="catalog-section">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Fetching products from Express server...</p>
+    </div>
+  } @else if (filteredProducts().length === 0) {
+    <div class="empty-state glass-panel">
+      <div class="empty-icon">📦</div>
+      <h3>No Products Found</h3>
+      <p>Try adjusting your search criteria or price filters.</p>
+    </div>
+  } @else {
+    <div class="products-grid">
+      @for (product of filteredProducts(); track product.product_id) {
+        <article class="product-card glass-panel">
+          <div class="card-image-wrapper">
+            <img [src]="product.image" [alt]="product.title" (error)="handleImageError($event)" class="card-image" />
+            <span class="price-tag">$ {{ product.price | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="product-title" [title]="product.title">{{ product.title }}</h3>
+            <p class="product-desc">{{ product.description }}</p>
+
+            <div class="card-footer">
+              <a [routerLink]="['/products', product.product_id]" class="btn btn-secondary btn-sm">
+                View Details
+              </a>
+
+              @if (auth.isAuthenticated() && (auth.currentUser()?.id === product.user_id || auth.currentUser()?.id === 1)) {
+                <div class="owner-actions">
+                  <a [routerLink]="['/products', product.product_id, 'edit']" class="btn btn-secondary btn-icon" title="Edit">
+                    ✏️
+                  </a>
+                  <button (click)="deleteProduct(product.product_id)" class="btn btn-danger btn-icon" title="Delete">
+                    🗑️
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
