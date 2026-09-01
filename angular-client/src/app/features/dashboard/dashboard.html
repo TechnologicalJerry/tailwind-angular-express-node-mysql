@@ -1,1 +1,62 @@
-<p>dashboard works!</p>
+<div class="dashboard-header glass-panel">
+  <div class="user-summary">
+    <div class="user-avatar">
+      {{ (auth.currentUser()?.name || 'U')[0].toUpperCase() }}
+    </div>
+    <div>
+      <h1 class="gradient-text">{{ auth.currentUser()?.name }}</h1>
+      <p class="user-email">{{ auth.currentUser()?.email }}</p>
+    </div>
+  </div>
+
+  <button (click)="revokeCurrentSession()" class="btn btn-danger">
+    🔒 Revoke Current Session
+  </button>
+</div>
+
+<section class="sessions-section">
+  <h2 class="section-title">Active User Sessions</h2>
+  <p class="section-subtitle">Sessions linked to your account via Express JWT authentication</p>
+
+  @if (loading()) {
+    <div class="loading-state glass-panel">
+      <div class="spinner"></div>
+      <p>Loading session logs...</p>
+    </div>
+  } @else if (sessions().length === 0) {
+    <div class="empty-state glass-panel">
+      <p>No active sessions found.</p>
+    </div>
+  } @else {
+    <div class="sessions-list">
+      @for (s of sessions(); track s.id) {
+        <div class="session-card glass-panel" [class.active]="s.valid">
+          <div class="session-header">
+            <span class="session-id">Session #{{ s.id }}</span>
+            <span class="status-badge" [class.valid]="s.valid">
+              {{ s.valid ? 'Active' : 'Invalidated' }}
+            </span>
+          </div>
+
+          <div class="session-body">
+            <div class="user-agent">
+              <span class="agent-icon">💻</span>
+              <span class="agent-text">{{ s.user_agent || 'Mozilla Web Client' }}</span>
+            </div>
+
+            <div class="timestamps">
+              <div>
+                <span class="time-label">Created At:</span>
+                <span class="time-val">{{ s.created_at | date:'medium' }}</span>
+              </div>
+              <div>
+                <span class="time-label">Last Updated:</span>
+                <span class="time-val">{{ s.updated_at | date:'medium' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>
