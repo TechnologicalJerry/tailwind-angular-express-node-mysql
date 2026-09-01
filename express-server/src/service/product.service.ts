@@ -40,6 +40,22 @@ export async function findProduct(
   }
 }
 
+export async function findProducts(query: Partial<ProductDocument> = {}) {
+  const metricsLabels = {
+    operation: "findProducts",
+  };
+
+  const timer = databaseResponseTimeHistogram.startTimer();
+  try {
+    const result = await ProductModel.find(query);
+    timer({ ...metricsLabels, success: "true" });
+    return result;
+  } catch (e) {
+    timer({ ...metricsLabels, success: "false" });
+    throw e;
+  }
+}
+
 export async function findAndUpdateProduct(
   query: Partial<ProductDocument>,
   update: Partial<ProductDocument>,
