@@ -62,6 +62,27 @@ export class ProductModel {
     return rows.length > 0 ? rows[0] : null;
   }
 
+  static async find(query: Partial<ProductDocument> = {}): Promise<ProductDocument[]> {
+    const conditions: string[] = [];
+    const values: any[] = [];
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined) {
+        conditions.push(`${key} = ?`);
+        values.push(value);
+      }
+    });
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const [rows] = await db.execute<ProductRow[]>(
+      `SELECT * FROM products ${whereClause} ORDER BY created_at DESC`,
+      values
+    );
+
+    return rows;
+  }
+
   static async findOneAndUpdate(
     query: Partial<ProductDocument>,
     update: Partial<ProductDocument>,
